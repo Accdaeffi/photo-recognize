@@ -20,8 +20,7 @@ public class ImagesConfig {
 	
 	@PostConstruct
 	public void init() {
-		System.out.println(filePath);
-		
+		filePath= filePath+"\\";
 		imagesCount = new File(filePath).listFiles().length;	
 	}
 	

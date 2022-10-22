@@ -1,0 +1,18 @@
+images:
+  basePath: C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\eclipse-workspace\\photorecognize\\src\\main\\resources\\images\\
+
+logging:
+  level:
+    root: info
+    org:
+      apache:
+        http: debug
+    #org.springframework.jdbc.core: TRACE
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(%-4.4line){blue} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}}"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    path: "./logs"
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB

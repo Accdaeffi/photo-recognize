@@ -15,7 +15,7 @@ public class ResultsSaver {
 	
 	private final static String format = "%s: photo %d is a %s";
 	
-	public void countResult(ResultDto result) {
+	public void saveResults(ResultDto result) {
 		log.info(String.format(format, result.getAsessorId(), result.getPhotoId(), result.getResult().getCode()));
 	
 		resultsCounter.countResult(result.getPhotoId());
