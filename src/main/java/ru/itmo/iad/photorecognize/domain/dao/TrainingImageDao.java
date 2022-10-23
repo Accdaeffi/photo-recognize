@@ -17,7 +17,7 @@ public class TrainingImageDao {
 	
 	@Id
 	@Field
-	private String id;
+	private String _id;
 	
 	@Field
 	private String imageId;

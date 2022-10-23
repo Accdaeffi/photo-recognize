@@ -13,7 +13,10 @@ import ru.itmo.iad.photorecognize.domain.Label;
 @Document(collection = "image_assessment")
 @Data
 @Builder
-public class ImageAssessmentDao {
+public class ImageAsessmentDao {
+	
+	@Field
+	ObjectId _id;
 	
 	@Field
 	String by;

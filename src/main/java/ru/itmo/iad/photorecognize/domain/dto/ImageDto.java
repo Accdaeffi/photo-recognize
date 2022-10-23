@@ -1,13 +1,15 @@
 package ru.itmo.iad.photorecognize.domain.dto;
 
+import java.io.InputStream;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class PhotoDto {
-	
-	int id;
-	byte[] data;
-	
+public class ImageDto {
+
+	String photoId;
+	InputStream data;
+
 }

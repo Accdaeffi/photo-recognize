@@ -1,11 +1,6 @@
 package ru.itmo.iad.photorecognize.telegram;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.annotation.PostConstruct;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -15,8 +10,6 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import ru.itmo.iad.photorecognize.domain.Label;
-import ru.itmo.iad.photorecognize.domain.ZeroLevelLabel;
 import ru.itmo.iad.photorecognize.telegram.commands.AbsCommand;
 import ru.itmo.iad.photorecognize.telegram.commands.RecordAsessmentCommand;
 import ru.itmo.iad.photorecognize.telegram.commands.keyboard.ShowLabelsKeyboardCommand;
@@ -27,16 +20,6 @@ import ru.itmo.iad.photorecognize.telegram.commands.keyboard.ShowZeroLevelLabels
 public class CallbackParser implements ApplicationContextAware {
 
 	ApplicationContext appContext;
-
-	List<String> zeroLevelLabelCodes;
-	List<String> labelCodes;
-
-	@PostConstruct
-	public void init() {
-		zeroLevelLabelCodes = Stream.of(ZeroLevelLabel.values()).map(lzl -> lzl.getButtonCode())
-				.collect(Collectors.toList());
-		labelCodes = Stream.of(Label.values()).map(label -> label.getButtonCode()).collect(Collectors.toList());
-	}
 
 	/**
 	 * Decide, which message was sent and execute necessary operations. Main method
@@ -57,18 +40,19 @@ public class CallbackParser implements ApplicationContextAware {
 					commandHandler = appContext.getBean(ShowZeroLevelLabelsKeyboardCommand.class, argument, messageId);
 				}
 				break;
-	
+				case "zero_level_label": {
+					commandHandler = appContext.getBean(ShowLabelsKeyboardCommand.class, argument, messageId);
+			
+				}
+				break;
+				case "label": {
+					commandHandler = appContext.getBean(RecordAsessmentCommand.class, messageAuthor, argument, messageId);
+			
+				}
+				break;
 				default: {
 					commandHandler = null;
 				}
-			}
-
-			if (zeroLevelLabelCodes.contains(command)) {
-				commandHandler = appContext.getBean(ShowLabelsKeyboardCommand.class, argument, command, messageId);
-			}
-
-			if (labelCodes.contains(command)) {
-				commandHandler = appContext.getBean(RecordAsessmentCommand.class, messageAuthor, argument, command, messageId);
 			}
 
 			return Optional.ofNullable(commandHandler);

@@ -8,13 +8,14 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum ZeroLevelLabel {
-	INDOOR("indoor", "Внутри"), OUTDOOR_NATURAL("outdoor_natural", "Природа"),
+	INDOOR("indoor", "Внутри"), 
+	OUTDOOR_NATURAL("outdoor_natural", "Природа"),
 	OUTDOOR_MAN_MADE("outdoor_man_made", "Строения");
 
 	private String buttonCode;
 	private String buttonText;
 
-	public ZeroLevelLabel getByButtonCode(String buttonCode) throws Exception {
+	public static ZeroLevelLabel getByButtonCode(String buttonCode) throws Exception {
 		return Arrays.stream(ZeroLevelLabel.values())
 				.filter(label -> label.getButtonCode().equals(buttonCode))
 				.findFirst()
