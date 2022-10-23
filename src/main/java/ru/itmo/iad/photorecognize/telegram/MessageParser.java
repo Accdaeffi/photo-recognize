@@ -19,7 +19,6 @@ import ru.itmo.iad.photorecognize.telegram.commands.AbsCommand;
 import ru.itmo.iad.photorecognize.telegram.commands.NextImageCommand;
 import ru.itmo.iad.photorecognize.telegram.commands.exception.NotEnoughParametersExceptionCommand;
 import ru.itmo.iad.photorecognize.telegram.commands.general.HelpCommand;
-import ru.itmo.iad.photorecognize.telegram.commands.general.InfoCommand;
 import ru.itmo.iad.photorecognize.telegram.commands.general.StartCommand;
 
 @Service
@@ -54,12 +53,12 @@ public class MessageParser implements ApplicationContextAware {
 				commandHandler = appContext.getBean(HelpCommand.class);
 			}
 				break;
-			/*case "/info": {
-				commandHandler = appContext.getBean(InfoCommand.class, argument);
-			}
-				break;*/
+			/*
+			 * case "/info": { commandHandler = appContext.getBean(InfoCommand.class,
+			 * argument); } break;
+			 */
 			case "/next": {
-				commandHandler = appContext.getBean(NextImageCommand.class, argument);
+				commandHandler = appContext.getBean(NextImageCommand.class);
 			}
 				break;
 
@@ -70,6 +69,7 @@ public class MessageParser implements ApplicationContextAware {
 
 			return Optional.ofNullable(commandHandler);
 		} catch (BeansException ex) {
+			log.error("Error!", ex);
 			return Optional.ofNullable(appContext.getBean(NotEnoughParametersExceptionCommand.class));
 		} catch (Exception ex) {
 			log.error("Error during parsing command {}!", messageText, ex);

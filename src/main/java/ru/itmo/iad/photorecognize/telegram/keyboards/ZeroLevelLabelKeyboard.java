@@ -3,7 +3,7 @@ package ru.itmo.iad.photorecognize.telegram.keyboards;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jvnet.hk2.annotations.Service;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -13,6 +13,8 @@ import ru.itmo.iad.photorecognize.domain.ZeroLevelLabel;
 public class ZeroLevelLabelKeyboard {
 
 	public InlineKeyboardMarkup getKeyboard(String photoId) {
+		System.out.println(photoId);
+		
 		InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
 
 		List<List<InlineKeyboardButton>> rowList = new ArrayList<>();

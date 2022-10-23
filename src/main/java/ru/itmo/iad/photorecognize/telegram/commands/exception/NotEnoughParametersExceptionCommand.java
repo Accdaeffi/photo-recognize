@@ -1,7 +1,7 @@
 package ru.itmo.iad.photorecognize.telegram.commands.exception;
 
-import org.jvnet.hk2.annotations.Service;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
 import ru.itmo.iad.photorecognize.telegram.commands.AbsCommand;
 import ru.itmo.iad.photorecognize.telegram.response.Response;

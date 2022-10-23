@@ -32,12 +32,12 @@ public class ImageGetter {
 	@Autowired
 	private ImageAsessmentRepository imageAsessmentRepository;
 
-    @Autowired
-    private GridFsTemplate gridFsTemplate;
+	@Autowired
+	private GridFsTemplate gridFsTemplate;
 
-    @Autowired
-    private GridFsOperations operations;
-    
+	@Autowired
+	private GridFsOperations operations;
+
 	private final double LEAST_PICKED_PROCENT = 0.35;
 
 	public ImageDto getImage() throws IllegalStateException, IOException {
@@ -55,8 +55,9 @@ public class ImageGetter {
 
 		trainingImageRepository.findAll().forEach(image -> imagesAsessmentCount.put(image.get_id(), 0));
 
-		imageAsessmentRepository.findAll().stream().forEach(
-				image -> imagesAsessmentCount.put(image.get_id(), imagesAsessmentCount.get(image.get_id()) + 1));
+		imageAsessmentRepository.findAll().stream().forEach(asessment -> {
+			imagesAsessmentCount.put(asessment.getImageId(), imagesAsessmentCount.get(asessment.getImageId()) + 1);
+		});
 
 		ObjectId minId = null;
 		int minimumCount = 1000;
@@ -66,26 +67,26 @@ public class ImageGetter {
 				minId = entry.getKey();
 				minimumCount = entry.getValue();
 			}
-			
+
 		}
 
 		TrainingImageDao dao = trainingImageRepository.findById(minId).get();
-		
+
 		return convertDaoToDto(dao);
 	}
 
 	private ImageDto getRandom() throws IllegalStateException, IOException {
 		List<TrainingImageDao> images = trainingImageRepository.findAll();
-		
+
 		Collections.shuffle(images);
-		
+
 		return convertDaoToDto(images.get(0));
 	}
-	
+
 	private ImageDto convertDaoToDto(TrainingImageDao dao) throws IllegalStateException, IOException {
 		GridFSFile file = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(dao.getImageId())));
-		
-        return new ImageDto(dao.get_id().toHexString(), operations.getResource(file).getInputStream());
+
+		return new ImageDto(dao.get_id().toHexString(), operations.getResource(file).getInputStream());
 	}
 
 }

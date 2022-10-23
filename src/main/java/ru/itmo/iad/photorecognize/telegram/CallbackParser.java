@@ -29,6 +29,8 @@ public class CallbackParser implements ApplicationContextAware {
 
 		try {
 
+			System.out.println(messageText);
+			
 			String arr[] = messageText.split(" ", 2);
 			String command = arr[0];
 			String argument = (arr.length > 1) ? arr[1] : null;

@@ -1,8 +1,8 @@
 package ru.itmo.iad.photorecognize.domain;
 
 public enum Dataset {
-	EDUCATION("train"), 
-	VALIDATION("test");
+	train("train"), 
+	test("test");
 
 	String code;
 

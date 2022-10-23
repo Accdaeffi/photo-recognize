@@ -1,9 +1,12 @@
 package ru.itmo.iad.photorecognize.telegram.commands.general;
 
+import org.springframework.stereotype.Service;
+
 import ru.itmo.iad.photorecognize.telegram.commands.AbsCommand;
 import ru.itmo.iad.photorecognize.telegram.response.Response;
 import ru.itmo.iad.photorecognize.telegram.response.StringResponse;
 
+@Service
 public class StartCommand extends AbsCommand {
 
 	@Override

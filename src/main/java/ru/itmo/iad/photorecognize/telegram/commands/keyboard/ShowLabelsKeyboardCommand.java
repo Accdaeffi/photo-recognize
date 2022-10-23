@@ -1,14 +1,14 @@
 package ru.itmo.iad.photorecognize.telegram.commands.keyboard;
 
-import org.jvnet.hk2.annotations.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import ru.itmo.iad.photorecognize.domain.ZeroLevelLabel;
 import ru.itmo.iad.photorecognize.telegram.commands.AbsCommand;
 import ru.itmo.iad.photorecognize.telegram.keyboards.LabelKeyboard;
-import ru.itmo.iad.photorecognize.telegram.response.EditMessageResponse;
+import ru.itmo.iad.photorecognize.telegram.response.EditMessageReplyMarkupResponse;
 import ru.itmo.iad.photorecognize.telegram.response.Response;
 
 @Service
@@ -23,6 +23,8 @@ public class ShowLabelsKeyboardCommand extends AbsCommand {
 	private final int messageId;
 
 	public ShowLabelsKeyboardCommand(String argument, int messageId) throws Exception {
+		System.out.println(argument);
+		
 		String[] splittedArgument = argument.split(" ", 2);
 		this.photoId = splittedArgument[0];
 		this.zeroLevelLabel = ZeroLevelLabel.getByButtonCode(splittedArgument[1]);
@@ -32,7 +34,7 @@ public class ShowLabelsKeyboardCommand extends AbsCommand {
 	@Override
 	public Response<?> execute() {
 		InlineKeyboardMarkup keyboard = labelKeyboard.getKeyboard(photoId, zeroLevelLabel);
-		return new EditMessageResponse(null, messageId, keyboard);
+		return new EditMessageReplyMarkupResponse(keyboard, messageId);
 	}
 
 }

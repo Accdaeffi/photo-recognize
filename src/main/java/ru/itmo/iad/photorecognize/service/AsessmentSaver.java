@@ -1,6 +1,6 @@
 package ru.itmo.iad.photorecognize.service;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +15,18 @@ public class AsessmentSaver {
 
 	@Autowired
 	ImageAsessmentRepository imageAsessmentRepository;
-	
+
 	public void saveAssessment(String userId, String photoId, Label label) {
+		System.out.println(photoId);
+
 		ImageAsessmentDao dao = ImageAsessmentDao.builder()
 				._id(ObjectId.get())
 				.by(userId)
-				.image(new ObjectId(photoId))
-				.label(label)
-				.dt_created(new Timestamp(System.currentTimeMillis()))
+				.imageId(new ObjectId(photoId))
+				.label(label.toString())
+				.dt_created(new Date())
 				.build();
-		
+
 		imageAsessmentRepository.save(dao);
 	}
 }
