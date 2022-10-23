@@ -2,6 +2,7 @@ package ru.itmo.iad.photorecognize.domain.dao;
 
 import java.sql.Timestamp;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -17,10 +18,10 @@ public class TrainingImageDao {
 	
 	@Id
 	@Field
-	private String _id;
+	private ObjectId _id;
 	
 	@Field
-	private String imageId;
+	private ObjectId imageId;
 	
 	@Field
 	private String fileName;

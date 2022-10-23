@@ -1,5 +1,14 @@
-images:
-  basePath: C:\\Users\\\u041F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C\\eclipse-workspace\\photorecognize\\src\\main\\resources\\images\\
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: springboot-mongo
+
+telegram:
+  bot:
+    username: ${}
+    token: ${}
 
 logging:
   level:
