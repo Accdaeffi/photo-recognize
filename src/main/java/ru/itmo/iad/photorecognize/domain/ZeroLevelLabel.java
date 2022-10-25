@@ -8,9 +8,9 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum ZeroLevelLabel {
-	INDOOR("indoor", "Внутри"), 
-	OUTDOOR_NATURAL("outdoor_natural", "Природа"),
-	OUTDOOR_MAN_MADE("outdoor_man_made", "Строения");
+	INDOOR("indoor", "Внутри помещения"), 
+	OUTDOOR_NATURAL("outdoor_natural", "Снаружи, нерукотворное"),
+	OUTDOOR_MAN_MADE("outdoor_man_made", "Снаружи, рукотворное");
 
 	private String buttonCode;
 	private String buttonText;
