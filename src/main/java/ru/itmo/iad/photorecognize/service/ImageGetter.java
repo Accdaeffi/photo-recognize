@@ -84,7 +84,7 @@ public class ImageGetter {
 	}
 
 	private ImageDto convertDaoToDto(TrainingImageDao dao) throws IllegalStateException, IOException {
-		GridFSFile file = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(dao.getImageId())));
+		GridFSFile file = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(dao.getFileId())));
 
 		return new ImageDto(dao.get_id().toHexString(), operations.getResource(file).getInputStream());
 	}

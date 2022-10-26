@@ -27,6 +27,5 @@ public class ImageAsessmentDao {
 	String label;
 
 	@Field
-	Date dt_created;
-
+	Date dtCreated;
 }

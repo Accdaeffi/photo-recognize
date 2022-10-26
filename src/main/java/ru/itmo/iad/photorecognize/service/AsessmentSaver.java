@@ -24,7 +24,7 @@ public class AsessmentSaver {
 				.by(userId)
 				.imageId(new ObjectId(photoId))
 				.label(label.toString())
-				.dt_created(new Date())
+				.dtCreated(new Date())
 				.build();
 
 		imageAsessmentRepository.save(dao);
