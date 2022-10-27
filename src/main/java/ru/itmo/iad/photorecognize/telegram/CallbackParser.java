@@ -28,8 +28,6 @@ public class CallbackParser implements ApplicationContextAware {
 	public Optional<AbsCommand> parseCallback(@NonNull String messageText, int messageId, @NonNull User messageAuthor) {
 
 		try {
-
-			System.out.println(messageText);
 			
 			String arr[] = messageText.split(" ", 2);
 			String command = arr[0];

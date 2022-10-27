@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Date;
 
-import lombok.val;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -16,7 +15,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import ru.itmo.iad.photorecognize.domain.Dataset;
 import ru.itmo.iad.photorecognize.domain.dao.TrainingImageDao;
-import ru.itmo.iad.photorecognize.domain.repository.ImageAsessmentRepository;
 import ru.itmo.iad.photorecognize.domain.repository.TrainingImageRepository;
 import ru.itmo.iad.photorecognize.telegram.Bot;
 
@@ -28,7 +26,6 @@ public class ImageSaver {
 
 	@Autowired
 	TrainingImageRepository trainingImageRepository;
-
 
 	public ObjectId saveTrainingImage(PhotoSize photo, Bot bot) {
 
@@ -54,20 +51,14 @@ public class ImageSaver {
 			try {
 				File image = bot.downloadFile(filePath);
 
-			     ObjectId fileId = gridFsTemplate.store(
-			    		 new FileInputStream(image), image.getName());
+				ObjectId fileId = gridFsTemplate.store(new FileInputStream(image), image.getName());
 
-				 var trainingImage = TrainingImageDao.builder()
-					 ._id(ObjectId.get())
-					 .fileId(fileId)
-					 .fileName(image.getName())
-					 .dataset(Dataset.test)
-					 .dtCreated(new Date())
-					 .build();
+				var trainingImage = TrainingImageDao.builder()._id(ObjectId.get()).fileId(fileId)
+						.fileName(image.getName()).dataset(Dataset.test).dtCreated(new Date()).build();
 
-				 trainingImageRepository.save(trainingImage);
+				trainingImageRepository.save(trainingImage);
 
-			     return trainingImage.get_id();
+				return trainingImage.get_id();
 
 			} catch (TelegramApiException e) {
 				e.printStackTrace();

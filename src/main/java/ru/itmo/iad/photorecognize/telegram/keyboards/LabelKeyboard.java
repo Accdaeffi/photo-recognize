@@ -15,7 +15,7 @@ import ru.itmo.iad.photorecognize.domain.ZeroLevelLabel;
 @Service
 public class LabelKeyboard {
 
-	public InlineKeyboardMarkup getKeyboard(String photoId, ZeroLevelLabel zeroLevelLabel) {
+	public InlineKeyboardMarkup getKeyboard(String photoId, ZeroLevelLabel zeroLevelLabel, boolean isHoneypot) {
 		InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
 
 		List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
@@ -27,7 +27,10 @@ public class LabelKeyboard {
 		for (Label label : labels) {
 			InlineKeyboardButton button = new InlineKeyboardButton();
 			button.setText(label.getButtonText());
-			button.setCallbackData(String.format("label %s %s", photoId, label.getButtonCode()));
+			button.setCallbackData(String.format("label %s %s %s", 
+					photoId, 
+					label.getButtonCode(), 
+					isHoneypot ? "true" : "false"));
 
 			List<InlineKeyboardButton> row = new ArrayList<>();
 			row.add(button);
@@ -37,7 +40,7 @@ public class LabelKeyboard {
 
 		InlineKeyboardButton button = new InlineKeyboardButton();
 		button.setText("Назад");
-		button.setCallbackData(String.format("back"));
+		button.setCallbackData(String.format("back %s %s", photoId, isHoneypot ? "true" : "false"));
 
 		rowList.add(List.of(button));
 

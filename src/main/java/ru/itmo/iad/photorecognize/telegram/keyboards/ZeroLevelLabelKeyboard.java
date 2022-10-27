@@ -12,9 +12,7 @@ import ru.itmo.iad.photorecognize.domain.ZeroLevelLabel;
 @Service
 public class ZeroLevelLabelKeyboard {
 
-	public InlineKeyboardMarkup getKeyboard(String photoId) {
-		System.out.println(photoId);
-		
+	public InlineKeyboardMarkup getKeyboard(String photoId, boolean isHoneypot) {
 		InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
 
 		List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
@@ -22,7 +20,10 @@ public class ZeroLevelLabelKeyboard {
 		for (ZeroLevelLabel label : ZeroLevelLabel.values()) {
 			InlineKeyboardButton button = new InlineKeyboardButton();
 			button.setText(label.getButtonText());
-			button.setCallbackData(String.format("zero_level_label %s %s", photoId, label.getButtonCode()));
+			button.setCallbackData(String.format("zero_level_label %s %s %s", 
+					photoId, 
+					label.getButtonCode(), 
+					isHoneypot ? "true" : "false"));
 
 			List<InlineKeyboardButton> row = new ArrayList<>();
 			row.add(button);

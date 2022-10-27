@@ -19,15 +19,19 @@ public class ShowZeroLevelLabelsKeyboardCommand extends AbsCommand {
 
 	private final String photoId;
 	private final int messageId;
+	private final boolean isHoneypot;
 
-	public ShowZeroLevelLabelsKeyboardCommand(String photoId, int messageId) {
-		this.photoId = photoId;
+	public ShowZeroLevelLabelsKeyboardCommand(String argument, int messageId) {
+
+		String[] splittedArgument = argument.split(" ", 2);
+		this.photoId = splittedArgument[0];
+		this.isHoneypot = Boolean.parseBoolean(splittedArgument[1]);
 		this.messageId = messageId;
 	}
 
 	@Override
 	public Response<?> execute() {
-		InlineKeyboardMarkup keyboard = zeroLevelLabelKeyboard.getKeyboard(photoId);
+		InlineKeyboardMarkup keyboard = zeroLevelLabelKeyboard.getKeyboard(photoId, isHoneypot);
 		return new EditMessageReplyMarkupResponse(keyboard, messageId);
 	}
 

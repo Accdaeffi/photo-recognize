@@ -20,20 +20,20 @@ public class ShowLabelsKeyboardCommand extends AbsCommand {
 
 	private final String photoId;
 	private final ZeroLevelLabel zeroLevelLabel;
+	private final boolean isHoneypot;
 	private final int messageId;
 
-	public ShowLabelsKeyboardCommand(String argument, int messageId) throws Exception {
-		System.out.println(argument);
-		
-		String[] splittedArgument = argument.split(" ", 2);
+	public ShowLabelsKeyboardCommand(String argument, int messageId) throws Exception {	
+		String[] splittedArgument = argument.split(" ", 3);
 		this.photoId = splittedArgument[0];
 		this.zeroLevelLabel = ZeroLevelLabel.getByButtonCode(splittedArgument[1]);
+		this.isHoneypot = Boolean.parseBoolean(splittedArgument[2]);
 		this.messageId = messageId;
 	}
 
 	@Override
 	public Response<?> execute() {
-		InlineKeyboardMarkup keyboard = labelKeyboard.getKeyboard(photoId, zeroLevelLabel);
+		InlineKeyboardMarkup keyboard = labelKeyboard.getKeyboard(photoId, zeroLevelLabel, isHoneypot);
 		return new EditMessageReplyMarkupResponse(keyboard, messageId);
 	}
 

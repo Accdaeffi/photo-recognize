@@ -15,10 +15,11 @@ public class AsessmentSaver {
 
 	@Autowired
 	ImageAsessmentRepository imageAsessmentRepository;
+	
+	@Autowired
+	AsessorService asessorService;
 
-	public void saveAssessment(String userId, String photoId, Label label) {
-		System.out.println(photoId);
-
+	public void saveAssessment(String userId, String photoId, Label label, boolean isHoneypot) {
 		ImageAsessmentDao dao = ImageAsessmentDao.builder()
 				._id(ObjectId.get())
 				.by(userId)
@@ -28,5 +29,9 @@ public class AsessmentSaver {
 				.build();
 
 		imageAsessmentRepository.save(dao);
+		
+		if (isHoneypot) {
+			asessorService.increaseHoneypotCounter(userId);
+		}
 	}
 }

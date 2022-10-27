@@ -10,6 +10,7 @@ import lombok.Data;
 public class ImageDto {
 
 	String photoId;
+	boolean isHoneypot;
 	InputStream data;
 
 }

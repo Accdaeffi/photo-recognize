@@ -24,21 +24,21 @@ public class RecordAsessmentCommand extends AbsCommand {
 	private final User asessor;
 	private final String photoId;
 	private final Label label;
+	private final boolean isHoneypot;
 	private final int messageId;
 
 	public RecordAsessmentCommand(User asessor, String argument, int messageId) throws Exception {
-		System.out.println(argument);
-
 		this.asessor = asessor;
-		String[] splittedArgument = argument.split(" ", 2);
+		String[] splittedArgument = argument.split(" ", 3);
 		this.photoId = splittedArgument[0];
 		this.label = Label.getByButtonCode(splittedArgument[1]);
+		this.isHoneypot = Boolean.parseBoolean(splittedArgument[2]);
 		this.messageId = messageId;
 	}
 
 	@Override
 	public Response<?> execute() {
-		assessmentSaver.saveAssessment(asessor.getId().toString(), photoId, label);
+		assessmentSaver.saveAssessment(asessor.getId().toString(), photoId, label, isHoneypot);
 
 		return new EditMessageReplyMarkupResponse(thanksKeyboard.getKeyboard(label), messageId);
 	}

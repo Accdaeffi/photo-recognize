@@ -58,7 +58,7 @@ public class MessageParser implements ApplicationContextAware {
 			 * argument); } break;
 			 */
 			case "/next": {
-				commandHandler = appContext.getBean(NextImageCommand.class);
+				commandHandler = appContext.getBean(NextImageCommand.class, messageAuthor);
 			}
 				break;
 

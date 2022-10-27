@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
 
+import ru.itmo.iad.photorecognize.domain.Dataset;
 import ru.itmo.iad.photorecognize.domain.dao.TrainingImageDao;
 import ru.itmo.iad.photorecognize.domain.dto.ImageDto;
 import ru.itmo.iad.photorecognize.domain.repository.ImageAsessmentRepository;
@@ -39,21 +40,28 @@ public class ImageGetter {
 	private GridFsOperations operations;
 
 	private final double LEAST_PICKED_PROCENT = 0.35;
+	
+	private final double HONEYPOT_BASE_PROCENT = 0.7;
+	private final int MAXIMUM_HONEYPOT_COUNT = 10;
 
-	public ImageDto getImage() throws IllegalStateException, IOException {
+	public ImageDto getImage(int honeypotCount) throws IllegalStateException, IOException {
 		Random r = new Random();
-
-		if (r.nextDouble() < LEAST_PICKED_PROCENT) {
-			return getLeastPicked();
+		
+		if (honeypotCount < MAXIMUM_HONEYPOT_COUNT && r.nextDouble() < (HONEYPOT_BASE_PROCENT/(honeypotCount+1))) {
+			return getHoneypot();
 		} else {
-			return getRandom();
+			if (r.nextDouble() < LEAST_PICKED_PROCENT) {
+				return getLeastPicked();
+			} else {
+				return getRandom();
+			}
 		}
 	}
 
 	private ImageDto getLeastPicked() throws IllegalStateException, IOException {
 		Map<ObjectId, Integer> imagesAsessmentCount = new HashMap<ObjectId, Integer>();
 
-		trainingImageRepository.findAll().forEach(image -> imagesAsessmentCount.put(image.get_id(), 0));
+		trainingImageRepository.findByDataset(Dataset.test).forEach(image -> imagesAsessmentCount.put(image.get_id(), 0));
 
 		imageAsessmentRepository.findAll().stream().forEach(asessment -> {
 			imagesAsessmentCount.put(asessment.getImageId(), imagesAsessmentCount.get(asessment.getImageId()) + 1);
@@ -76,17 +84,28 @@ public class ImageGetter {
 	}
 
 	private ImageDto getRandom() throws IllegalStateException, IOException {
-		List<TrainingImageDao> images = trainingImageRepository.findAll();
+		List<TrainingImageDao> images = trainingImageRepository.findByDataset(Dataset.test);
 
 		Collections.shuffle(images);
 
 		return convertDaoToDto(images.get(0));
 	}
+	
+	private ImageDto getHoneypot() throws IllegalStateException, IOException {
+		List<TrainingImageDao> images = trainingImageRepository.findByDataset(Dataset.train);
+
+		Collections.shuffle(images);
+
+		return convertDaoToDto(images.get(0));
+	}
+	
 
 	private ImageDto convertDaoToDto(TrainingImageDao dao) throws IllegalStateException, IOException {
 		GridFSFile file = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(dao.getFileId())));
 
-		return new ImageDto(dao.get_id().toHexString(), operations.getResource(file).getInputStream());
+		return new ImageDto(dao.get_id().toHexString(), 
+				dao.getDataset() == Dataset.train ? true : false, 
+				operations.getResource(file).getInputStream());
 	}
 
 }
