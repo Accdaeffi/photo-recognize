@@ -9,19 +9,15 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.User;
 
 import lombok.extern.slf4j.Slf4j;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import ru.itmo.iad.photorecognize.domain.Label;
 import ru.itmo.iad.photorecognize.domain.dao.AsessorDao;
 import ru.itmo.iad.photorecognize.domain.dto.ImageDto;
 import ru.itmo.iad.photorecognize.service.AsessmentSaver;
 import ru.itmo.iad.photorecognize.service.AsessorService;
 import ru.itmo.iad.photorecognize.service.ImageGetter;
-import ru.itmo.iad.photorecognize.telegram.keyboards.ThanksKeyboard;
 import ru.itmo.iad.photorecognize.telegram.keyboards.ZeroLevelLabelKeyboard;
-import ru.itmo.iad.photorecognize.telegram.response.EditMessageReplyMarkupResponse;
-import ru.itmo.iad.photorecognize.telegram.response.MultiResponse;
-import ru.itmo.iad.photorecognize.telegram.response.PhotoResponse;
-import ru.itmo.iad.photorecognize.telegram.response.Response;
-import ru.itmo.iad.photorecognize.telegram.response.StringResponse;
+import ru.itmo.iad.photorecognize.telegram.response.*;
 
 @Service
 @Scope("prototype")
@@ -32,14 +28,11 @@ public class RecordAsessmentCommand extends AbsCommand {
 	AsessmentSaver assessmentSaver;
 
 	@Autowired
-	ThanksKeyboard thanksKeyboard;
-	
-	@Autowired
 	AsessorService asessorService;
-	
+
 	@Autowired
 	ImageGetter imageGetter;
-	
+
 	@Autowired
 	ZeroLevelLabelKeyboard zeroLevelLabelKeyboard;
 
@@ -62,8 +55,13 @@ public class RecordAsessmentCommand extends AbsCommand {
 	public Response<?> execute() {
 		List<Response<?>> responses = new ArrayList<Response<?>>();
 		assessmentSaver.saveAssessment(user.getId().toString(), photoId, label, isHoneypot);
-		
-		responses.add(new EditMessageReplyMarkupResponse(thanksKeyboard.getKeyboard(label), messageId));
+
+		var response = new EditMessageCaptionResponse(
+			"Спасибо за идентификацию " + label.getButtonText() + " ✅",
+			messageId,
+			new InlineKeyboardMarkup(new ArrayList<>())
+		);
+		responses.add(response);
 
 		try {
 			AsessorDao asessor = asessorService.getOrCreateAsessor(user);
@@ -75,9 +73,9 @@ public class RecordAsessmentCommand extends AbsCommand {
 			log.error("Ошибка!", e);
 			responses.add(new StringResponse("Ошибка получения фото!"));
 		}
-		
+
 		return new MultiResponse(responses);
-		
+
 	}
 
 }

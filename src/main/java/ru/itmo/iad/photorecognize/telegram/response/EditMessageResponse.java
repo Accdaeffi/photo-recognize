@@ -1,5 +1,6 @@
 package ru.itmo.iad.photorecognize.telegram.response;
 
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageCaption;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -7,8 +8,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class EditMessageResponse extends StringResponse {
 
-	private int editingMessageId;
-	private InlineKeyboardMarkup replyKeyboard;
+	protected int editingMessageId;
+	protected InlineKeyboardMarkup replyKeyboard;
 
 	public EditMessageResponse(String responseContent, int editingMessageId, InlineKeyboardMarkup replyKeyboard) {
 		super(responseContent);
