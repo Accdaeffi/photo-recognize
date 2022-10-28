@@ -61,10 +61,13 @@ public class ImageGetter {
 	private ImageDto getLeastPicked() throws IllegalStateException, IOException {
 		Map<ObjectId, Integer> imagesAsessmentCount = new HashMap<ObjectId, Integer>();
 
-		trainingImageRepository.findByDataset(Dataset.test).forEach(image -> imagesAsessmentCount.put(image.get_id(), 0));
+		trainingImageRepository.findByDataset(Dataset.test)
+		.forEach(image -> imagesAsessmentCount.put(image.get_id(), 0));
 
 		imageAsessmentRepository.findAll().stream().forEach(asessment -> {
-			imagesAsessmentCount.put(asessment.getImageId(), imagesAsessmentCount.get(asessment.getImageId()) + 1);
+			if (imagesAsessmentCount.containsKey(asessment.getImageId())) {
+				imagesAsessmentCount.put(asessment.getImageId(), imagesAsessmentCount.get(asessment.getImageId()) + 1);
+			}
 		});
 
 		ObjectId minId = null;
