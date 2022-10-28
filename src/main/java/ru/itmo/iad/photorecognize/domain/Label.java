@@ -19,16 +19,13 @@ public enum Label {
 	WATER("outdoor natural/water, ice, snow", "water", "Вода", ZeroLevelLabel.OUTDOOR_NATURAL),
 	LANDSCAPE("outdoor natural/mountains, hills, desert, sky", "landscape", "Рельеф или пустыни", ZeroLevelLabel.OUTDOOR_NATURAL),
 	FOREST("outdoor natural/forest, field, jungle", "forest", "Леса и поля", ZeroLevelLabel.OUTDOOR_NATURAL),
-	OUT_NAT_AMB("outdoor natural/ambiguous", "out_nat_amb", "Неоднозначное", ZeroLevelLabel.OUTDOOR_NATURAL),
-	
+
 	OUT_TRANSPORT("outdoor man-made/transportation", "out_transport", "Транспорт", ZeroLevelLabel.OUTDOOR_MAN_MADE),
 	OUT_CULTURAL("outdoor man-made/cultural or historical building or place", "out_cultural", "Культурное, историческое, военное", ZeroLevelLabel.OUTDOOR_MAN_MADE),
 	OUT_SPORT("outdoor man-made/sports fields, parks, leisure spaces", "out_sport", "Спорт, развлечения и парки", ZeroLevelLabel.OUTDOOR_MAN_MADE),
 	INDUSTRY("outdoor man-made/industrial and construction", "industry", "Промышленность", ZeroLevelLabel.OUTDOOR_MAN_MADE),
 	VILLAGE("outdoor man-made/houses, cabins, gardens, and farms", "village", "Загородные объекты", ZeroLevelLabel.OUTDOOR_MAN_MADE),
-	CITY("outdoor man-made/commercial buildings, shops, markets, cities, and towns", "city", "Городские объекты", ZeroLevelLabel.OUTDOOR_MAN_MADE),
-	OUT_MAN_AMB("outdoor man-made/ambiguous", "out_man_amb", "Неоднозначное", ZeroLevelLabel.OUTDOOR_MAN_MADE);
-
+	CITY("outdoor man-made/commercial buildings, shops, markets, cities, and towns", "city", "Городские объекты", ZeroLevelLabel.OUTDOOR_MAN_MADE);
 
 	public String databaseCode;
 	public String buttonCode;
