@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import ru.itmo.iad.photorecognize.domain.Label;
-import ru.itmo.iad.photorecognize.domain.dao.AsessorDao;
+import ru.itmo.iad.photorecognize.domain.dao.AssessorDao;
 import ru.itmo.iad.photorecognize.domain.dto.ImageDto;
 import ru.itmo.iad.photorecognize.service.AsessmentSaver;
 import ru.itmo.iad.photorecognize.service.AsessorService;
@@ -64,7 +64,7 @@ public class RecordAsessmentCommand extends AbsCommand {
 		responses.add(response);
 
 		try {
-			AsessorDao asessor = asessorService.getOrCreateAsessor(user);
+			AssessorDao asessor = asessorService.getOrCreateAsessor(user);
 			ImageDto image = imageGetter.getImage(asessor.getHoneypotCount());
 
 			responses.add(new PhotoResponse(image.getData(), image.getPhotoId(), null,

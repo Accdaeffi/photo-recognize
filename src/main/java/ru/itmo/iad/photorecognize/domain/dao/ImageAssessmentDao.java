@@ -1,5 +1,7 @@
 package ru.itmo.iad.photorecognize.domain.dao;
 
+import java.util.Date;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -7,20 +9,23 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import lombok.Builder;
 import lombok.Data;
 
-@Document(collection = "asessor")
+@Document(collection = "image_assessment")
 @Data
 @Builder
-public class AsessorDao {
+public class ImageAssessmentDao {
 
 	@Field
 	ObjectId _id;
 
 	@Field
-	String telegramId;
+	String by;
 
 	@Field
-	String username;
+	ObjectId imageId;
 
 	@Field
-	int honeypotCount;
+	String label;
+
+	@Field
+	Date dtCreated;
 }

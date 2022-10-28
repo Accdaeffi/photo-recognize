@@ -5,10 +5,10 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import ru.itmo.iad.photorecognize.domain.dao.AsessorDao;
+import ru.itmo.iad.photorecognize.domain.dao.AssessorDao;
 
-public interface AsessorRepository extends MongoRepository<AsessorDao, ObjectId> {
+public interface AsessorRepository extends MongoRepository<AssessorDao, ObjectId> {
 
-	Optional<AsessorDao> findByTelegramId(String telegramId);
+	Optional<AssessorDao> findByTelegramId(String telegramId);
 	
 }
