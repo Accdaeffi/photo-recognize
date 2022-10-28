@@ -26,8 +26,11 @@ public class ImageSaver {
 
 	@Autowired
 	TrainingImageRepository trainingImageRepository;
+	
+	@Autowired
+	Bot bot;
 
-	public ObjectId saveTrainingImage(PhotoSize photo, Bot bot) {
+	public ObjectId saveTrainingImage(PhotoSize photo) {
 
 		String filePath;
 
@@ -63,7 +66,6 @@ public class ImageSaver {
 			} catch (TelegramApiException e) {
 				e.printStackTrace();
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 

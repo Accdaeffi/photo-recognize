@@ -8,10 +8,10 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.itmo.iad.photorecognize.service.ImageSaver;
 import ru.itmo.iad.photorecognize.telegram.Bot;
 import ru.itmo.iad.photorecognize.telegram.CallbackParser;
 import ru.itmo.iad.photorecognize.telegram.MessageParser;
+import ru.itmo.iad.photorecognize.telegram.PhotoParser;
 
 @Slf4j
 @Configuration
@@ -24,10 +24,11 @@ public class TelegramBotConfig {
 	String botToken;
 
 	@Bean
-	public Bot bot(MessageParser messageParser, CallbackParser callbackParser, ImageSaver imageSaver) throws Exception {
+	public Bot bot(MessageParser messageParser, CallbackParser callbackParser, PhotoParser photoParser)
+			throws Exception {
 		try {
 			TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-			Bot bot = new Bot(botUsername, botToken, messageParser, callbackParser, imageSaver);
+			Bot bot = new Bot(botUsername, botToken, messageParser, callbackParser, photoParser);
 
 			botsApi.registerBot(bot);
 

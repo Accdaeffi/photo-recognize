@@ -1,41 +1,35 @@
 package ru.itmo.iad.photorecognize.telegram;
 
-import java.util.Comparator;
 import java.util.Optional;
 
-import org.bson.types.ObjectId;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.itmo.iad.photorecognize.service.ImageSaver;
 import ru.itmo.iad.photorecognize.telegram.commands.AbsCommand;
 import ru.itmo.iad.photorecognize.telegram.response.Response;
-import ru.itmo.iad.photorecognize.telegram.response.StringResponse;
 
 @Slf4j
 public class Bot extends TelegramLongPollingBot {
 
 	private final MessageParser commandParser;
 	private final CallbackParser callbackParser;
+	private final PhotoParser photoParser;
 
 	private final String BOT_USERNAME;
 	private final String BOT_TOKEN;
 
-	private final ImageSaver imageSaver;
-
 	public Bot(String botUserName, String botToken, MessageParser commandParser, CallbackParser callbackParser,
-			ImageSaver imageSaver) {
+			PhotoParser photoParser) {
 		this.BOT_USERNAME = botUserName;
 		this.BOT_TOKEN = botToken;
 		this.commandParser = commandParser;
 		this.callbackParser = callbackParser;
-		this.imageSaver = imageSaver;
+		this.photoParser = photoParser;
 	}
 
 	@Override
@@ -48,24 +42,29 @@ public class Bot extends TelegramLongPollingBot {
 			User author = message.getFrom();
 
 			log.info("Message!");
-			
+
 			if (message.hasPhoto() && "asd2a2213h".equals(message.getCaption())) {
-				log.info("Received photo to save!");
 
-				PhotoSize photo = message.getPhoto().stream().max(Comparator.comparing(PhotoSize::getFileSize))
-						.orElse(null);
+				String messageText = message.getCaption();
 
-				ObjectId id = imageSaver.saveTrainingImage(photo, this);
+				/* Parsing command */
+				Optional<AbsCommand> optionalCommandHandler = photoParser.parseMessage(message.getPhoto(), messageText,
+						author);
 
-				try {
-					if (id != null) {
-						new StringResponse(id.toString()).send(this, chatId);
-					} else {
-						new StringResponse("Ошибка!").send(this, chatId);
+				optionalCommandHandler.ifPresent(handler -> {
+					try {
+
+						/* Executing command */
+						Response<?> result = handler.execute();
+
+						/* Sending result of command */
+						result.send(this, chatId);
+					} catch (TelegramApiException ex) {
+						log.error("Error sending result of command {} from {}!", messageText, author.getId(), ex);
+					} catch (Exception ex) {
+						log.error("Error during processing command {}!", messageText, ex);
 					}
-				} catch (TelegramApiException e) {
-					e.printStackTrace();
-				}
+				});
 
 			} else {
 				if (message.hasText()) {
