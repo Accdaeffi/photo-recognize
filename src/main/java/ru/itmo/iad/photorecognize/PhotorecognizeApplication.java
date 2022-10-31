@@ -8,8 +8,6 @@ public class PhotorecognizeApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PhotorecognizeApplication.class, args);
-		
-		while (true) {}
 	}
 
 }
