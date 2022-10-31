@@ -7,7 +7,7 @@ spring:
 
 telegram:
   bot:
-    username: ${BOT_USERNMAE:@photo_recognize_bot}
+    username: ${BOT_USERNMAE:@photo_recognize_assessor_bot}
     token: ${BOT_TOKEN}
 
 logging:
