@@ -32,3 +32,7 @@ logs
 .idea/jarRepositories.xml
 .idea/encodings.xml
 .idea/compiler.xml
+
+/shelf/
+/workspace.xml
+/.idea/
