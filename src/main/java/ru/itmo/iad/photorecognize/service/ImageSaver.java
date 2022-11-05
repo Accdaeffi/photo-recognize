@@ -1,10 +1,5 @@
 package ru.itmo.iad.photorecognize.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Date;
-
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -12,67 +7,74 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import ru.itmo.iad.photorecognize.domain.Dataset;
-import ru.itmo.iad.photorecognize.domain.dao.TrainingImageDao;
-import ru.itmo.iad.photorecognize.domain.repository.TrainingImageRepository;
+import ru.itmo.iad.photorecognize.domain.dao.UserImageDto;
+import ru.itmo.iad.photorecognize.domain.repository.UserImageRepository;
 import ru.itmo.iad.photorecognize.telegram.Bot;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Date;
 
 @Service
 public class ImageSaver {
 
-	@Autowired
-	GridFsTemplate gridFsTemplate;
+    @Autowired
+    GridFsTemplate gridFsTemplate;
 
-	@Autowired
-	TrainingImageRepository trainingImageRepository;
-	
-	@Autowired
-	Bot bot;
+    @Autowired
+    UserImageRepository userImageRepository;
 
-	public ObjectId saveTrainingImage(PhotoSize photo) {
+    @Autowired
+    Bot bot;
 
-		String filePath;
+    public ObjectId saveUserImage(String userId, PhotoSize photo) {
 
-		if (photo.getFilePath() != null) {
-			filePath = photo.getFilePath();
-		} else {
-			GetFile getFileMethod = new GetFile();
-			getFileMethod.setFileId(photo.getFileId());
+        String filePath;
 
-			try {
-				org.telegram.telegrambots.meta.api.objects.File file = bot.execute(getFileMethod);
+        if (photo.getFilePath() != null) {
+            filePath = photo.getFilePath();
+        } else {
+            GetFile getFileMethod = new GetFile();
+            getFileMethod.setFileId(photo.getFileId());
 
-				filePath = file.getFilePath();
-			} catch (TelegramApiException e) {
-				filePath = null;
-				e.printStackTrace();
-			}
-		}
+            try {
+                org.telegram.telegrambots.meta.api.objects.File file = bot.execute(getFileMethod);
 
-		if (filePath != null) {
-			try {
-				File image = bot.downloadFile(filePath);
+                filePath = file.getFilePath();
+            } catch (TelegramApiException e) {
+                filePath = null;
+                e.printStackTrace();
+            }
+        }
 
-				ObjectId fileId = gridFsTemplate.store(new FileInputStream(image), image.getName());
+        if (filePath != null) {
+            try {
+                File image = bot.downloadFile(filePath);
 
-				var trainingImage = TrainingImageDao.builder()._id(ObjectId.get()).fileId(fileId)
-						.fileName(image.getName()).dataset(Dataset.test).dtCreated(new Date()).build();
+                ObjectId fileId = gridFsTemplate.store(new FileInputStream(image), image.getName());
 
-				trainingImageRepository.save(trainingImage);
+                var trainingImage = UserImageDto.builder()
+                        ._id(ObjectId.get())
+                        .fileId(fileId)
+                        .senderId(userId)
+                        .dtCreated(new Date())
+                        .build();
 
-				return trainingImage.get_id();
+                userImageRepository.save(trainingImage);
 
-			} catch (TelegramApiException e) {
-				e.printStackTrace();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+                return trainingImage.get_id();
 
-		}
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
 
-		return null;
+        }
 
-	}
+        return null;
+
+    }
 
 }

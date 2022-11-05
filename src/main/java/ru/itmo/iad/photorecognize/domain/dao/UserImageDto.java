@@ -10,10 +10,10 @@ import ru.itmo.iad.photorecognize.domain.Dataset;
 
 import java.util.Date;
 
-@Document(collection = "training_image")
+@Document(collection = "user_image")
 @Data
 @Builder
-public class TrainingImageDao {
+public class UserImageDto {
 
     @Id
     @Field
@@ -23,13 +23,7 @@ public class TrainingImageDao {
     private ObjectId fileId;
 
     @Field
-    private String fileName;
-
-    @Field
-    private Dataset dataset;
-
-    @Field
-    private String label;
+    private String senderId;
 
     @Field
     private Date dtCreated;

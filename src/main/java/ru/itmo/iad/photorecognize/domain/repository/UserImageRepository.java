@@ -6,10 +6,10 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import ru.itmo.iad.photorecognize.domain.Dataset;
-import ru.itmo.iad.photorecognize.domain.dao.TrainingImageDao;
+import ru.itmo.iad.photorecognize.domain.dao.UserImageDto;
 
-public interface TrainingImageRepository extends MongoRepository<TrainingImageDao, ObjectId> {
+public interface UserImageRepository extends MongoRepository<UserImageDto, ObjectId> {
 	
-	List<TrainingImageDao> findByDataset(Dataset dataset);
+	List<UserImageDto> findByDataset(Dataset dataset);
 
 }

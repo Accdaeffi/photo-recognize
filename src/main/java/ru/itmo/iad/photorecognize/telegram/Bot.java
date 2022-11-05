@@ -17,18 +17,15 @@ import ru.itmo.iad.photorecognize.telegram.response.Response;
 public class Bot extends TelegramLongPollingBot {
 
 	private final MessageParser commandParser;
-	private final CallbackParser callbackParser;
 	private final PhotoParser photoParser;
 
 	private final String BOT_USERNAME;
 	private final String BOT_TOKEN;
 
-	public Bot(String botUserName, String botToken, MessageParser commandParser, CallbackParser callbackParser,
-			PhotoParser photoParser) {
+	public Bot(String botUserName, String botToken, MessageParser commandParser, PhotoParser photoParser) {
 		this.BOT_USERNAME = botUserName;
 		this.BOT_TOKEN = botToken;
 		this.commandParser = commandParser;
-		this.callbackParser = callbackParser;
 		this.photoParser = photoParser;
 	}
 
@@ -43,7 +40,7 @@ public class Bot extends TelegramLongPollingBot {
 
 			log.info("Message!");
 
-			if (message.hasPhoto() && "asd2a2213h".equals(message.getCaption())) {
+			if (message.hasPhoto()) {
 
 				String messageText = message.getCaption();
 
@@ -96,38 +93,6 @@ public class Bot extends TelegramLongPollingBot {
 					}
 				}
 			}
-		}
-
-		if (update.hasCallbackQuery())
-
-		{
-			CallbackQuery callback = update.getCallbackQuery();
-
-			String messageText = callback.getData();
-			long chatId = callback.getMessage().getChatId();
-			int messageId = callback.getMessage().getMessageId();
-			User author = callback.getFrom();
-
-			String authorId = (author.getUserName() == null) ? author.getFirstName() : author.getUserName();
-			log.info("Callback \"{}\" from {}", messageText, authorId);
-
-			/* Parsing callback */
-			Optional<AbsCommand> optionalCallbackHandler = callbackParser.parseCallback(messageText, messageId, author);
-
-			optionalCallbackHandler.ifPresent(handler -> {
-				try {
-
-					/* Executing command */
-					Response<?> result = handler.execute();
-
-					/* Sending result of command */
-					result.send(this, chatId);
-				} catch (TelegramApiException ex) {
-					log.error("Error sending result of callback {} from {}!", messageText, author.getId(), ex);
-				} catch (Exception ex) {
-					log.error("Error during processing callback {}!", messageText, ex);
-				}
-			});
 		}
 	}
 

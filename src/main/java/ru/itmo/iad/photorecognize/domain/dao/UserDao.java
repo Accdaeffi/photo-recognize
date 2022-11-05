@@ -7,10 +7,10 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import lombok.Builder;
 import lombok.Data;
 
-@Document(collection = "assessor")
+@Document(collection = "user")
 @Data
 @Builder
-public class AssessorDao {
+public class UserDao {
 
 	@Field
 	ObjectId _id;
@@ -20,7 +20,4 @@ public class AssessorDao {
 
 	@Field
 	String username;
-
-	@Field
-	int honeypotCount;
 }
