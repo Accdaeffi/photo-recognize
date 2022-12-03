@@ -63,6 +63,68 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.8</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<excludes>
+								<exclude>/**/PhotorecognizeApplication*</exclude>
+								<exclude>/**/service/ImageSaver*</exclude>
+								<exclude>/**/conf/**</exclude>
+								<exclude>/**/domain/**</exclude>
+								<exclude>/**/texts/**</exclude>
+								<exclude>/**/exception/**</exclude>
+								<exclude>/**/photos/**</exclude>
+								<exclude>/**/telegram/*</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+					<execution>
+						<id>jacoco-check</id>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<rule>
+									<element>CLASS</element>
+									<limits>
+										<limit>
+											<counter>LINE</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.80</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
+							<excludes>
+								<exclude>/**/PhotorecognizeApplication*</exclude>
+								<exclude>/**/service/ImageSaver*</exclude>
+								<exclude>/**/conf/**</exclude>
+								<exclude>/**/domain/**</exclude>
+								<exclude>/**/texts/**</exclude>
+								<exclude>/**/exception/**</exclude>
+								<exclude>/**/photos/**</exclude>
+								<exclude>/**/telegram/*</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
