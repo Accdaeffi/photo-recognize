@@ -27,8 +27,8 @@ public class PhotoParser implements ApplicationContextAware {
      * Decide, which message was sent and execute necessary operations. Main method
      * of the class.
      */
-    public Optional<AbsCommand> parseMessage(@NonNull List<PhotoSize> photoSizes, @Nullable String messageText,
-                                             @NonNull User messageAuthor) {
+    public Optional<AbsCommand> parseMessageWithPhoto(@NonNull List<PhotoSize> photoSizes, @Nullable String messageText,
+                                                      @NonNull User messageAuthor) {
 
         try {
             String command;
@@ -49,7 +49,7 @@ public class PhotoParser implements ApplicationContextAware {
             AbsCommand commandHandler;
 
             if (command == null) {
-                commandHandler = appContext.getBean(RecognizePhotoCommand.class, messageAuthor, photoSizes);
+                commandHandler = appContext.getBean(RecognizePhotoCommand.class, photoSizes);
             } else {
                 switch (command) {
                     default: {

@@ -2,6 +2,7 @@ package ru.itmo.iad.photorecognize.telegram.commands.photos;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import ru.itmo.iad.photorecognize.domain.Label;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Scope("prototype")
 @Slf4j
 public class RecognizePhotoCommand extends AbsCommand {
 
