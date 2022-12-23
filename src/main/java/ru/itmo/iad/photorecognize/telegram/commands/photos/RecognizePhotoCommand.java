@@ -43,7 +43,7 @@ public class RecognizePhotoCommand extends AbsCommand {
 
         PhotoSize photo = photoSizes.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
 
-        //TODO: добавила валидацию картинок, потом нужно будет раскомментировать
+        //TODO: добавила валидацию картинок, потом нужно будет раскомментировать и поправить
         /*String result = checkUserImage(photo);
         if (!result.equals("ok")) {
             return new StringResponse(result);
@@ -79,7 +79,7 @@ public class RecognizePhotoCommand extends AbsCommand {
     }
 
     private boolean checkSizes(PhotoSize photo) {
-        return photo.getHeight() < 1080 && photo.getWidth() < 1920;
+        return photo.getHeight() >= 1080 && photo.getWidth() <= 1920;
     }
 
     private boolean checkExtension(PhotoSize photo) {
