@@ -10,8 +10,6 @@ import ru.itmo.iad.photorecognize.telegram.Bot;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.Comparator;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -21,21 +19,19 @@ public class PhotoGetter {
     Bot bot;
 
     @Nullable
-    public File getUserImage(List<PhotoSize> photoSizes) {
+    public File getUserImage(PhotoSize photoSize) {
         String filePath;
 
-        PhotoSize photo = photoSizes.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
-
-        if (photo == null) {
-            log.error("Error getting max photo size!");
+        if (photoSize == null) {
+            log.error("Error getting max photoSize size!");
             return null;
         }
 
-        if (photo.getFilePath() != null) {
-            filePath = photo.getFilePath();
+        if (photoSize.getFilePath() != null) {
+            filePath = photoSize.getFilePath();
         } else {
             GetFile getFileMethod = new GetFile();
-            getFileMethod.setFileId(photo.getFileId());
+            getFileMethod.setFileId(photoSize.getFileId());
 
             try {
                 org.telegram.telegrambots.meta.api.objects.File file = bot.execute(getFileMethod);
@@ -50,7 +46,7 @@ public class PhotoGetter {
         try {
             return bot.downloadFile(filePath);
         } catch (TelegramApiException e) {
-            log.error("Error downloading photo!", e);
+            log.error("Error downloading photoSize!", e);
             return null;
         }
     }

@@ -14,6 +14,7 @@ import ru.itmo.iad.photorecognize.telegram.response.StringResponse;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,37 +41,40 @@ public class RecognizePhotoCommand extends AbsCommand {
 
         log.info("Received photo to recognise!");
 
-        File file = photoGetter.getUserImage(photoSizes);
+        PhotoSize photoSize = photoSizes.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
+
+        String checkResult = checkUserImage(photoSize);
+        if (!checkResult.equals("ok")) {
+            return new StringResponse(checkResult);
+        }
+
+        File file = photoGetter.getUserImage(photoSize);
 
         if (file != null) {
             log.info("Photo got!");
 
-        PhotoSize photo = photoSizes.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
-
-        //TODO: добавила валидацию картинок, потом нужно будет раскомментировать и поправить
-        /*String result = checkUserImage(photo);
-        if (!result.equals("ok")) {
-            return new StringResponse(result);
-        }*/
-
-        imageSaver.saveUserImage(user.getTelegramId(), photo);
             Map<Label, Double> labelsProbabilities = imageRecognizer.recognizePhoto(file);
 
-            log.info("Labels probabilities got!");
+            if (labelsProbabilities != null) {
 
-            String probabilities = labelsProbabilities.entrySet()
-                    .stream()
-                    .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                    .limit(3)
-                    .map((entry) -> String.format("%s(%f)", entry.getKey().getButtonText(), entry.getValue()))
-                    .reduce((acc, value) -> acc + ", " + value)
-                    .orElse(null);
+                log.info("Labels probabilities got!");
 
-            if (probabilities != null) {
-                String result = "Самые вероятные классы (с вероятностями):" + probabilities;
-                return new StringResponse(result);
+                String probabilities = labelsProbabilities.entrySet()
+                        .stream()
+                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                        .limit(3)
+                        .map((entry) -> String.format("%s(%f)", entry.getKey().getButtonText(), entry.getValue()))
+                        .reduce((acc, value) -> acc + ", " + value)
+                        .orElse(null);
+
+                if (probabilities != null) {
+                    String result = "Самые вероятные классы (с вероятностями):" + probabilities;
+                    return new StringResponse(result);
+                } else {
+                    return new StringResponse("Ошибка при внутренней обработки полученых классов!");
+                }
             } else {
-                return new StringResponse("Ошибка при внутренней обработки полученых классов!");
+                return new StringResponse("Ошибка при получении списка вероятностей!");
             }
         } else {
             log.info("Getting photo failed!");
@@ -82,8 +86,7 @@ public class RecognizePhotoCommand extends AbsCommand {
         StringBuilder result = new StringBuilder();
         Optional.ofNullable(photo).ifPresentOrElse(
                 (photoToCheck) -> {
-                    if (!checkSizes(photoToCheck) || !checkExtension(photoToCheck)
-                            || !checkSize(photoToCheck)) {
+                    if (!checkSizes(photoToCheck) || !checkSize(photoToCheck)) {
                         result.append("User image has invalid size or extension " +
                                 "(max size is 1920*1080, image: png, jpg, jpeg)");
                     } else {
@@ -102,11 +105,5 @@ public class RecognizePhotoCommand extends AbsCommand {
 
     private boolean checkSizes(PhotoSize photo) {
         return photo.getHeight() >= 1080 && photo.getWidth() <= 1920;
-    }
-
-    private boolean checkExtension(PhotoSize photo) {
-        return photo.getFilePath().endsWith(".jpg")
-                || photo.getFilePath().endsWith(".jpeg")
-                || photo.getFilePath().endsWith(".png");
     }
 }

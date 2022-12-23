@@ -8,7 +8,6 @@ import ru.itmo.iad.photorecognize.domain.Label;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -24,8 +23,6 @@ public class ImageRecognizer {
             MockMultipartFile mockMultipartFile = new MockMultipartFile("file", "original.jpeg", "image/jpeg", fileStream);
 
             Map<String, Object> stringProbabilitiesMap = neuralNetworkClient.recognizePhoto(mockMultipartFile);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
