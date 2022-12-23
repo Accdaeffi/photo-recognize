@@ -10,6 +10,9 @@ telegram:
     username: ${BOT_USERNMAE:@photo_recognize_bot}
     token: ${BOT_TOKEN}
 
+neural-network:
+  base-url: localhost:9090
+
 logging:
   level:
     root: info

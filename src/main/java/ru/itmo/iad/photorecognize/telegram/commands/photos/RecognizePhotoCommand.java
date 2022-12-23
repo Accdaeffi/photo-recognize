@@ -4,32 +4,31 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
-import org.telegram.telegrambots.meta.api.objects.User;
-import ru.itmo.iad.photorecognize.domain.dao.UserDao;
-import ru.itmo.iad.photorecognize.service.ImageSaver;
-import ru.itmo.iad.photorecognize.service.UserService;
+import ru.itmo.iad.photorecognize.domain.Label;
+import ru.itmo.iad.photorecognize.service.ImageRecognizer;
+import ru.itmo.iad.photorecognize.service.PhotoGetter;
 import ru.itmo.iad.photorecognize.telegram.commands.AbsCommand;
 import ru.itmo.iad.photorecognize.telegram.response.Response;
 import ru.itmo.iad.photorecognize.telegram.response.StringResponse;
 
-import java.util.Comparator;
+import java.io.File;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
 public class RecognizePhotoCommand extends AbsCommand {
 
     @Autowired
-    ImageSaver imageSaver;
+    PhotoGetter photoGetter;
 
     @Autowired
-    UserService userService;
+    ImageRecognizer imageRecognizer;
 
-    private User telegramUser;
     private final List<PhotoSize> photoSizes;
 
-    public RecognizePhotoCommand(User telegramUser, List<PhotoSize> photoSizes) {
-        this.telegramUser = telegramUser;
+    public RecognizePhotoCommand(List<PhotoSize> photoSizes) {
         this.photoSizes = photoSizes;
     }
 
@@ -38,13 +37,32 @@ public class RecognizePhotoCommand extends AbsCommand {
 
         log.info("Received photo to recognise!");
 
-        UserDao user = userService.getOrCreateUser(telegramUser);
+        File file = photoGetter.getUserImage(photoSizes);
 
-        PhotoSize photo = photoSizes.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
-        imageSaver.saveUserImage(user.getTelegramId(), photo);
+        if (file != null) {
+            log.info("Photo got!");
 
-        log.info("Photo saved, user updated!");
+            Map<Label, Double> labelsProbabilities = imageRecognizer.recognizePhoto(file);
 
-        return new StringResponse("Success!");
+            log.info("Labels probabilities got!");
+
+            String probabilities = labelsProbabilities.entrySet()
+                    .stream()
+                    .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                    .limit(3)
+                    .map((entry) -> String.format("%s(%f)", entry.getKey().getButtonText(), entry.getValue()))
+                    .reduce((acc, value) -> acc + ", " + value)
+                    .orElse(null);
+
+            if (probabilities != null) {
+                String result = "Самые вероятные классы (с вероятностями):" + probabilities;
+                return new StringResponse(result);
+            } else {
+                return new StringResponse("Ошибка при внутренней обработки полученых классов!");
+            }
+        } else {
+            log.info("Getting photo failed!");
+            return new StringResponse("Ошибка при загрузка фото из Telegram!");
+        }
     }
 }
