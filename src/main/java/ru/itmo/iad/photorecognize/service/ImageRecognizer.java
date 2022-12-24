@@ -1,9 +1,9 @@
 package ru.itmo.iad.photorecognize.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import ru.itmo.iad.photorecognize.domain.Label;
+import ru.itmo.iad.photorecognize.domain.dto.ImageAssessingDto;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -20,9 +20,15 @@ public class ImageRecognizer {
     @Nullable
     public Map<Label, Double> recognizePhoto(File file) {
         try (FileInputStream fileStream = new FileInputStream(file)) {
-            MockMultipartFile mockMultipartFile = new MockMultipartFile("file", "original.jpeg", "image/jpeg", fileStream);
 
-            Map<String, Object> stringProbabilitiesMap = neuralNetworkClient.recognizePhoto(mockMultipartFile);
+            byte[] photoBytes = fileStream.readAllBytes();
+            ImageAssessingDto imageAssessingDto = new ImageAssessingDto(photoBytes);
+
+            Map<String, Object> stringProbabilitiesMap = neuralNetworkClient.recognizePhoto(imageAssessingDto);
+
+            System.out.println(stringProbabilitiesMap);
+
+            // somehow convert
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
