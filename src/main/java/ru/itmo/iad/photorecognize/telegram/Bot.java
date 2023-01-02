@@ -3,7 +3,6 @@ package ru.itmo.iad.photorecognize.telegram;
 import java.util.Optional;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -45,7 +44,7 @@ public class Bot extends TelegramLongPollingBot {
 				String messageText = message.getCaption();
 
 				/* Parsing command */
-				Optional<AbsCommand> optionalCommandHandler = photoParser.parseMessage(message.getPhoto(), messageText,
+				Optional<AbsCommand> optionalCommandHandler = photoParser.parseMessageWithPhoto(message.getPhoto(), messageText,
 						author);
 
 				optionalCommandHandler.ifPresent(handler -> {

@@ -2,35 +2,37 @@ package ru.itmo.iad.photorecognize.telegram.commands.photos;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
-import org.telegram.telegrambots.meta.api.objects.User;
-import ru.itmo.iad.photorecognize.domain.dao.UserDao;
-import ru.itmo.iad.photorecognize.service.ImageSaver;
-import ru.itmo.iad.photorecognize.service.UserService;
+import ru.itmo.iad.photorecognize.domain.Label;
+import ru.itmo.iad.photorecognize.service.ImageRecognizer;
+import ru.itmo.iad.photorecognize.service.PhotoGetter;
 import ru.itmo.iad.photorecognize.telegram.commands.AbsCommand;
 import ru.itmo.iad.photorecognize.telegram.response.Response;
 import ru.itmo.iad.photorecognize.telegram.response.StringResponse;
 
+import java.io.File;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
+@Scope("prototype")
 @Slf4j
 public class RecognizePhotoCommand extends AbsCommand {
 
     @Autowired
-    ImageSaver imageSaver;
+    PhotoGetter photoGetter;
 
     @Autowired
-    UserService userService;
+    ImageRecognizer imageRecognizer;
 
-    private final User telegramUser;
     private final List<PhotoSize> photoSizes;
 
-    public RecognizePhotoCommand(User telegramUser, List<PhotoSize> photoSizes) {
-        this.telegramUser = telegramUser;
+    public RecognizePhotoCommand(List<PhotoSize> photoSizes) {
         this.photoSizes = photoSizes;
     }
 
@@ -39,29 +41,52 @@ public class RecognizePhotoCommand extends AbsCommand {
 
         log.info("Received photo to recognise!");
 
-        UserDao user = userService.getOrCreateUser(telegramUser);
+        PhotoSize photoSize = photoSizes.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
 
-        PhotoSize photo = photoSizes.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
+        String checkResult = checkUserImage(photoSize);
+        if (!checkResult.equals("ok")) {
+            return new StringResponse(checkResult);
+        }
 
-        //TODO: добавила валидацию картинок, потом нужно будет раскомментировать и поправить
-        /*String result = checkUserImage(photo);
-        if (!result.equals("ok")) {
-            return new StringResponse(result);
-        }*/
+        File file = photoGetter.getUserImage(photoSize);
 
-        imageSaver.saveUserImage(user.getTelegramId(), photo);
+        if (file != null) {
+            log.info("Photo got!");
 
-        log.info("Photo saved, user updated!");
+            Map<Label, Double> labelsProbabilities = imageRecognizer.recognizePhoto(file);
 
-        return new StringResponse("Success!");
+            if (labelsProbabilities != null) {
+
+                log.info("Labels probabilities got!");
+
+                String probabilities = labelsProbabilities.entrySet()
+                        .stream()
+                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                        .limit(3)
+                        .map((entry) -> String.format("%s(%f)", entry.getKey().getButtonText(), entry.getValue()))
+                        .reduce((acc, value) -> acc + ", " + value)
+                        .orElse(null);
+
+                if (probabilities != null) {
+                    String result = "Самые вероятные классы (с вероятностями):" + probabilities;
+                    return new StringResponse(result);
+                } else {
+                    return new StringResponse("Ошибка при внутренней обработки полученых классов!");
+                }
+            } else {
+                return new StringResponse("Ошибка при получении списка вероятностей!");
+            }
+        } else {
+            log.info("Getting photo failed!");
+            return new StringResponse("Ошибка при загрузка фото из Telegram!");
+        }
     }
 
     private String checkUserImage(PhotoSize photo) {
         StringBuilder result = new StringBuilder();
         Optional.ofNullable(photo).ifPresentOrElse(
                 (photoToCheck) -> {
-                    if (!checkSizes(photoToCheck) || !checkExtension(photoToCheck)
-                            || !checkSize(photoToCheck)) {
+                    if (!checkSizes(photoToCheck) || !checkSize(photoToCheck)) {
                         result.append("User image has invalid size or extension " +
                                 "(max size is 1920*1080, image: png, jpg, jpeg)");
                     } else {
@@ -80,11 +105,5 @@ public class RecognizePhotoCommand extends AbsCommand {
 
     private boolean checkSizes(PhotoSize photo) {
         return photo.getHeight() >= 1080 && photo.getWidth() <= 1920;
-    }
-
-    private boolean checkExtension(PhotoSize photo) {
-        return photo.getFilePath().endsWith(".jpg")
-                || photo.getFilePath().endsWith(".jpeg")
-                || photo.getFilePath().endsWith(".png");
     }
 }

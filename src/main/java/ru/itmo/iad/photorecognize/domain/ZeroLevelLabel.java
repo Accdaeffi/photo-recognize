@@ -8,7 +8,7 @@ import java.util.Arrays;
 @AllArgsConstructor
 @Getter
 public enum ZeroLevelLabel {
-	INDOOR("indoor", "Внутри помещения"), 
+	INDOOR("indoor", "Внутри помещения"),
 	OUTDOOR_NATURAL("outdoor_natural", "Снаружи, нерукотворное"),
 	OUTDOOR_MAN_MADE("outdoor_man_made", "Снаружи, рукотворное");
 
@@ -19,7 +19,7 @@ public enum ZeroLevelLabel {
 		return Arrays.stream(ZeroLevelLabel.values())
 				.filter(label -> label.getButtonCode().equals(buttonCode))
 				.findFirst()
-				.get(); 
+				.get();
 	}
 
 }
