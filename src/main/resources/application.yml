@@ -11,7 +11,7 @@ telegram:
     token: ${BOT_TOKEN}
 
 neural-network:
-  base-url: localhost:9090
+  base-url: ${NEURAL_NETWORK_HOST:localhost:9090}
 
 logging:
   level:
