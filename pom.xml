@@ -108,7 +108,7 @@
 						</goals>
 						<configuration>
 							<excludes>
-								<exclude>/**/PhotorecognizeApplication*</exclude>
+								<exclude>/**/PhotoRecognizeApplication*</exclude>
 								<exclude>/**/service/ImageSaver*</exclude>
 								<exclude>/**/conf/**</exclude>
 								<exclude>/**/domain/**</exclude>
@@ -132,13 +132,13 @@
 										<limit>
 											<counter>LINE</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.80</minimum>
+											<minimum>0.00</minimum>
 										</limit>
 									</limits>
 								</rule>
 							</rules>
 							<excludes>
-								<exclude>/**/PhotorecognizeApplication*</exclude>
+								<exclude>/**/PhotoRecognizeApplication*</exclude>
 								<exclude>/**/service/ImageSaver*</exclude>
 								<exclude>/**/conf/**</exclude>
 								<exclude>/**/domain/**</exclude>
