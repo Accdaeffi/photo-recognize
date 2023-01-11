@@ -9,7 +9,6 @@ import ru.itmo.iad.photorecognize.domain.dto.PredictionsDto;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,8 +43,10 @@ public class ImageRecognizer {
             return predictionsMap;
 
             // somehow convert
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 }
