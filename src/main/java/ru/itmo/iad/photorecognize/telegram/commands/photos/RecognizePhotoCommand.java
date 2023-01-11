@@ -85,23 +85,22 @@ public class RecognizePhotoCommand extends AbsCommand {
     private String checkUserImage(PhotoSize photo) {
         StringBuilder result = new StringBuilder();
         Optional.ofNullable(photo).ifPresentOrElse(
-                (photoToCheck) -> {
+                photoToCheck -> {
                     if (!checkSizes(photoToCheck) || !checkSize(photoToCheck)) {
-                        result.append("User image has invalid size or extension " +
-                                "(max size is 1920*1080, image: png, jpg, jpeg)");
+                        result.append("Изображение неправильного размера или формата " +
+                                "(максимальные размеры 1920*1080, 50Мб, форматы: png, jpg, jpeg)");
                     } else {
                         result.append("ok");
                     }
                 },
-                () -> result.append("Empty image")
+                () -> result.append("Пустое изображение")
         );
         return result.toString();
     }
 
     private boolean checkSize(PhotoSize photo) {
         int sizeInKb = photo.getFileSize() / 1024;
-        // TODO: check photo size
-        return sizeInKb >= 1 && sizeInKb / 1024 <= 100;
+        return sizeInKb >= 1 && (sizeInKb / 1024) <= 100;
     }
 
     private boolean checkSizes(PhotoSize photo) {

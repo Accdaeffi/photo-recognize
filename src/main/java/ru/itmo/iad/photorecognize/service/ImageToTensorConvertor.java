@@ -24,7 +24,6 @@ public class ImageToTensorConvertor {
 
         for (int i = 0; i < resizedImage.getHeight(); i++) {
             for (int j = 0; j < resizedImage.getWidth(); j++) {
-                // TODO: проверить, что не транспонирую
                 int rgb = resizedImage.getRGB(j, i);
 
                 resultArray[0][i][j] = ((rgb >> 16) & 0xff) / 255.0;
