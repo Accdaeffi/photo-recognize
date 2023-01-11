@@ -63,12 +63,12 @@ public class RecognizePhotoCommand extends AbsCommand {
                         .stream()
                         .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                         .limit(3)
-                        .map((entry) -> String.format("%s(%f)", entry.getKey().getButtonText(), entry.getValue()))
-                        .reduce((acc, value) -> acc + ", " + value)
+                        .map((entry) -> String.format("%s (%f)", entry.getKey().getButtonText(), entry.getValue()))
+                        .reduce((acc, value) -> acc + "\n" + value)
                         .orElse(null);
 
                 if (probabilities != null) {
-                    String result = "Самые вероятные классы (с вероятностями):" + probabilities;
+                    String result = "Самые вероятные классы (с вероятностями):\n" + probabilities;
                     return new StringResponse(result);
                 } else {
                     return new StringResponse("Ошибка при внутренней обработки полученых классов!");
@@ -100,10 +100,11 @@ public class RecognizePhotoCommand extends AbsCommand {
 
     private boolean checkSize(PhotoSize photo) {
         int sizeInKb = photo.getFileSize() / 1024;
-        return sizeInKb >= 1 && sizeInKb / 1024 <= 50;
+        // TODO: check photo size
+        return sizeInKb >= 1 && sizeInKb / 1024 <= 100;
     }
 
     private boolean checkSizes(PhotoSize photo) {
-        return photo.getHeight() >= 1080 && photo.getWidth() <= 1920;
+        return photo.getHeight() <= 1080 && photo.getWidth() <= 1920;
     }
 }
