@@ -7,12 +7,18 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import ru.itmo.iad.photorecognize.domain.Label;
 import ru.itmo.iad.photorecognize.service.ImageRecognizer;
+import ru.itmo.iad.photorecognize.service.ImageResizer;
+import ru.itmo.iad.photorecognize.service.ImageSaver;
 import ru.itmo.iad.photorecognize.service.PhotoGetter;
 import ru.itmo.iad.photorecognize.telegram.commands.AbsCommand;
 import ru.itmo.iad.photorecognize.telegram.response.Response;
 import ru.itmo.iad.photorecognize.telegram.response.StringResponse;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -26,9 +32,20 @@ public class RecognizePhotoCommand extends AbsCommand {
     @Autowired
     ImageRecognizer imageRecognizer;
 
+    @Autowired
+    ImageResizer resizer;
+
+    @Autowired
+    ImageSaver imageSaver;
+
+
+
     private final List<PhotoSize> photoSizes;
 
-    public RecognizePhotoCommand(List<PhotoSize> photoSizes) {
+    private final String userId;
+
+    public RecognizePhotoCommand(String userId, List<PhotoSize> photoSizes) {
+        this.userId = userId;
         this.photoSizes = photoSizes;
     }
 
@@ -47,30 +64,39 @@ public class RecognizePhotoCommand extends AbsCommand {
         File file = photoGetter.getUserImage(photoSize);
 
         if (file != null) {
-            log.info("Photo got!");
+            try {
+                log.info("Photo got!");
 
-            Map<Label, Double> labelsProbabilities = imageRecognizer.recognizePhoto(file);
+                BufferedImage originalImage = ImageIO.read(new FileInputStream(file));
+                BufferedImage resizedImage = resizer.resizeImage(originalImage, 224, 224);
+                imageSaver.saveImage(userId, resizedImage, UUID.randomUUID().toString());
 
-            if (labelsProbabilities != null) {
+                Map<Label, Double> labelsProbabilities = imageRecognizer.recognizePhoto(file);
 
-                log.info("Labels probabilities got!");
+                if (labelsProbabilities != null) {
 
-                String probabilities = labelsProbabilities.entrySet()
-                    .stream()
-                    .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                    .limit(3)
-                    .map(this::formatEntryText)
-                    .reduce((acc, value) -> acc + "\n" + value)
-                    .orElse(null);
+                    log.info("Labels probabilities got!");
 
-                if (probabilities != null) {
-                    String result = "Самые вероятные классы:\n" + probabilities;
-                    return new StringResponse(result);
+                    String probabilities = labelsProbabilities.entrySet()
+                        .stream()
+                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                        .limit(3)
+                        .map(this::formatEntryText)
+                        .reduce((acc, value) -> acc + "\n" + value)
+                        .orElse(null);
+
+                    if (probabilities != null) {
+                        String result = "Самые вероятные классы:\n" + probabilities;
+                        return new StringResponse(result);
+                    } else {
+                        return new StringResponse("Ошибка при внутренней обработки полученых классов!");
+                    }
                 } else {
-                    return new StringResponse("Ошибка при внутренней обработки полученых классов!");
+                    return new StringResponse("Ошибка при получении списка вероятностей!");
                 }
-            } else {
-                return new StringResponse("Ошибка при получении списка вероятностей!");
+            } catch (IOException ex) {
+                log.error("Ошибка при обработке!", ex);
+                return new StringResponse("Ошибка при вводе-выводе!");
             }
         } else {
             log.info("Getting photo failed!");
