@@ -28,7 +28,7 @@ public class ImageResizer {
         BufferedImage scaledBI = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = scaledBI.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.drawImage(croppedBI, 0, 0, width, height, null);
+        g.drawImage(originalImage, 0, 0, width, height, null);
         g.dispose();
         return scaledBI;
     }
