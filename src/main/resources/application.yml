@@ -3,7 +3,6 @@ spring:
     mongodb:
       uri: ${MONGO_CONNECTION_STRING}
       database: ${MONGO_DATABASE}
-      bucket: training_image
 
 telegram:
   bot:
