@@ -43,10 +43,10 @@ public class RecognizePhotoCommand extends AbsCommand {
 
         PhotoSize photoSize = photoSizes.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
 
-        String checkResult = checkUserImage(photoSize);
+     /*   String checkResult = checkUserImage(photoSize);
         if (!checkResult.equals("ok")) {
             return new StringResponse(checkResult);
-        }
+        }*/
 
         File file = photoGetter.getUserImage(photoSize);
 
