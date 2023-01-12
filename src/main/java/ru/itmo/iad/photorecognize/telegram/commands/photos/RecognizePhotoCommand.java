@@ -26,10 +26,9 @@ public class RecognizePhotoCommand extends AbsCommand {
     @Autowired
     ImageRecognizer imageRecognizer;
 
-    private final List<PhotoSize> photoSizes;
+    private final List<PhotoSize> photoSizes = List.of();
 
-    public RecognizePhotoCommand(List<PhotoSize> photoSizes) {
-        this.photoSizes = photoSizes;
+    public RecognizePhotoCommand() {
     }
 
     @Override
@@ -44,24 +43,29 @@ public class RecognizePhotoCommand extends AbsCommand {
             return new StringResponse(checkResult);
         }*/
 
-        File file = photoGetter.getUserImage(photoSize);
+        File file = new File("src/test/resources/test_image.jpg");
 
         if (file != null) {
             log.info("Photo got!");
 
-            Map<Label, Double> labelsProbabilities = imageRecognizer.recognizePhoto(file);
+//            Map<Label, Double> labelsProbabilities = imageRecognizer.recognizePhoto(file);
+            Map<Label, Double> labelsProbabilities = Map.of(
+                    Label.HOME, 0.1,
+                    Label.CITY, 0.4,
+                    Label.FOREST, 0.5
+            );
 
             if (labelsProbabilities != null) {
 
                 log.info("Labels probabilities got!");
 
                 String probabilities = labelsProbabilities.entrySet()
-                    .stream()
-                    .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                    .limit(3)
-                    .map(this::formatEntryText)
-                    .reduce((acc, value) -> acc + "\n" + value)
-                    .orElse(null);
+                        .stream()
+                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                        .limit(3)
+                        .map(this::formatEntryText)
+                        .reduce((acc, value) -> acc + "\n" + value)
+                        .orElse(null);
 
                 if (probabilities != null) {
                     String result = "Самые вероятные классы:\n" + probabilities;
@@ -84,25 +88,25 @@ public class RecognizePhotoCommand extends AbsCommand {
         Label label = entry.getKey();
 
         return String.format(
-            "▪ %.1f%% – %s (%s)",
-            probability,
-            label.getButtonText(),
-            label.getLabelZeroLevel().getButtonText()
+                "▪ %.1f%% – %s (%s)",
+                probability,
+                label.getButtonText(),
+                label.getLabelZeroLevel().getButtonText()
         );
     }
 
     private String checkUserImage(PhotoSize photo) {
         StringBuilder result = new StringBuilder();
         Optional.ofNullable(photo).ifPresentOrElse(
-            photoToCheck -> {
-                if (!checkSizes(photoToCheck) || !checkSize(photoToCheck)) {
-                    result.append("Изображение неправильного размера или формата " +
-                        "(максимальные размеры 1920*1080, 50Мб, форматы: png, jpg, jpeg)");
-                } else {
-                    result.append("ok");
-                }
-            },
-            () -> result.append("Пустое изображение")
+                photoToCheck -> {
+                    if (!checkSizes(photoToCheck) || !checkSize(photoToCheck)) {
+                        result.append("Изображение неправильного размера или формата " +
+                                "(максимальные размеры 1920*1080, 50Мб, форматы: png, jpg, jpeg)");
+                    } else {
+                        result.append("ok");
+                    }
+                },
+                () -> result.append("Пустое изображение")
         );
         return result.toString();
     }
