@@ -49,7 +49,7 @@ public class PhotoParser implements ApplicationContextAware {
             AbsCommand commandHandler;
 
             if (command == null) {
-                commandHandler = appContext.getBean(RecognizePhotoCommand.class, photoSizes);
+                commandHandler = appContext.getBean(RecognizePhotoCommand.class, messageAuthor.getId().toString(), photoSizes);
             } else {
                 switch (command) {
                     default: {
