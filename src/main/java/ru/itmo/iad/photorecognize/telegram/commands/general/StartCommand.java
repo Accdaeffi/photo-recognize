@@ -11,20 +11,19 @@ public class StartCommand extends AbsCommand {
     @Override
     public Response<?> execute() {
 
+        String text = """
+                Привет! Это бот, который определяет, что изображено на твоей фотографии.
 
-        StringBuilder builder = new StringBuilder();
-        // TODO: refactor
-        builder.append("Привет! Это бот, с помощью которого ты можешь помочь нам разметить фотографии.\n\n" +
-            "Все просто: ты получаешь фотографию и выбираешь, какой класс больше всего подходит " +
-            "главному объекту на изображении или идее изображения в целом. " +
-            "Людей и животных на фотографиях можно игнорировать.\n\n"
-            + "Мы написали подробное описание классов - обращайся к нему, если что-то не понятно.");
-        builder.append(System.lineSeparator());
-        builder.append(System.lineSeparator());
-        builder.append("https://docs.google.com/document/d/1pG41a8pfhYZNnzaHU08J-A06_P2_QkFhOHgTluehetU"
-            + "\n\nЧтобы начать, отправь команду /next.");
+                Все просто: ты загружаешь фотографию в диалог (в сжатом виде) и бот присылает тебе 3 наиболее вероятных класса того, что там изображено!
+                
+                Ограничения по фото: не более 50 Мб, 1080*1920
+                Форматы: png, jpg, jpeg
+                
+                Описание, что означает каждый класс, доступно по ссылке\s
+                https://docs.google.com/document/d/1pG41a8pfhYZNnzaHU08J-A06_P2_QkFhOHgTluehetU
+                """;
 
-        return new StringResponse(builder.toString());
+        return new StringResponse(text);
     }
 
 }

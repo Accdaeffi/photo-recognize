@@ -8,7 +8,7 @@ import java.util.Arrays;
 @AllArgsConstructor
 @Getter
 public enum ZeroLevelLabel {
-	INDOOR("indoor", "Внутри помещения"),
+	INDOOR("indoor", "В помещении"),
 	OUTDOOR_NATURAL("outdoor_natural", "Снаружи, нерукотворное"),
 	OUTDOOR_MAN_MADE("outdoor_man_made", "Снаружи, рукотворное");
 

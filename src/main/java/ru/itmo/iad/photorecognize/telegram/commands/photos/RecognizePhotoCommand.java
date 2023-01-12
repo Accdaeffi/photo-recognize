@@ -13,11 +13,7 @@ import ru.itmo.iad.photorecognize.telegram.response.Response;
 import ru.itmo.iad.photorecognize.telegram.response.StringResponse;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Scope("prototype")
@@ -43,10 +39,10 @@ public class RecognizePhotoCommand extends AbsCommand {
 
         PhotoSize photoSize = photoSizes.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
 
-        String checkResult = checkUserImage(photoSize);
+     /*   String checkResult = checkUserImage(photoSize);
         if (!checkResult.equals("ok")) {
             return new StringResponse(checkResult);
-        }
+        }*/
 
         File file = photoGetter.getUserImage(photoSize);
 
@@ -60,15 +56,15 @@ public class RecognizePhotoCommand extends AbsCommand {
                 log.info("Labels probabilities got!");
 
                 String probabilities = labelsProbabilities.entrySet()
-                        .stream()
-                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                        .limit(3)
-                        .map((entry) -> String.format("%s(%f)", entry.getKey().getButtonText(), entry.getValue()))
-                        .reduce((acc, value) -> acc + ", " + value)
-                        .orElse(null);
+                    .stream()
+                    .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                    .limit(3)
+                    .map(this::formatEntryText)
+                    .reduce((acc, value) -> acc + "\n" + value)
+                    .orElse(null);
 
                 if (probabilities != null) {
-                    String result = "Самые вероятные классы (с вероятностями):" + probabilities;
+                    String result = "Самые вероятные классы:\n" + probabilities;
                     return new StringResponse(result);
                 } else {
                     return new StringResponse("Ошибка при внутренней обработки полученых классов!");
@@ -82,28 +78,41 @@ public class RecognizePhotoCommand extends AbsCommand {
         }
     }
 
+    private String formatEntryText(Map.Entry<Label, Double> entry) {
+        // rounded to 1 digit after dot
+        Double probability = Math.round(entry.getValue() * 1000) / 10.0;
+        Label label = entry.getKey();
+
+        return String.format(
+            "▪ %.1f%% – %s (%s)",
+            probability,
+            label.getButtonText(),
+            label.getLabelZeroLevel().getButtonText()
+        );
+    }
+
     private String checkUserImage(PhotoSize photo) {
         StringBuilder result = new StringBuilder();
         Optional.ofNullable(photo).ifPresentOrElse(
-                (photoToCheck) -> {
-                    if (!checkSizes(photoToCheck) || !checkSize(photoToCheck)) {
-                        result.append("User image has invalid size or extension " +
-                                "(max size is 1920*1080, image: png, jpg, jpeg)");
-                    } else {
-                        result.append("ok");
-                    }
-                },
-                () -> result.append("Empty image")
+            photoToCheck -> {
+                if (!checkSizes(photoToCheck) || !checkSize(photoToCheck)) {
+                    result.append("Изображение неправильного размера или формата " +
+                        "(максимальные размеры 1920*1080, 50Мб, форматы: png, jpg, jpeg)");
+                } else {
+                    result.append("ok");
+                }
+            },
+            () -> result.append("Пустое изображение")
         );
         return result.toString();
     }
 
     private boolean checkSize(PhotoSize photo) {
         int sizeInKb = photo.getFileSize() / 1024;
-        return sizeInKb >= 1 && sizeInKb / 1024 <= 50;
+        return sizeInKb >= 1 && (sizeInKb / 1024) <= 100;
     }
 
     private boolean checkSizes(PhotoSize photo) {
-        return photo.getHeight() >= 1080 && photo.getWidth() <= 1920;
+        return photo.getHeight() <= 1080 && photo.getWidth() <= 1920;
     }
 }

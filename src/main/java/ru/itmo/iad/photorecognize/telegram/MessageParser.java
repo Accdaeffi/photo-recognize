@@ -1,5 +1,7 @@
 package ru.itmo.iad.photorecognize.telegram;
 
+import java.util.Optional;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -10,8 +12,6 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.User;
 import ru.itmo.iad.photorecognize.telegram.commands.AbsCommand;
 import ru.itmo.iad.photorecognize.telegram.commands.general.StartCommand;
-
-import java.util.Optional;
 
 @Service
 @Slf4j
