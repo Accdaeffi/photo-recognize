@@ -23,7 +23,7 @@ public class TrainingImageDto {
     private ObjectId fileId;
 
     @Field
-    private String filaName;
+    private String fileName;
 
     @Field
     private String senderId;

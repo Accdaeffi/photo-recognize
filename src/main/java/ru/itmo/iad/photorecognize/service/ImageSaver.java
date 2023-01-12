@@ -35,7 +35,7 @@ public class ImageSaver {
         var trainingImage = TrainingImageDto.builder()
                 ._id(ObjectId.get())
                 .fileId(fileId)
-                .filaName(imageName)
+                .fileName(imageName)
                 .dataset(Dataset.test)
                 .senderId(userId)
                 .dtCreated(new Date())
