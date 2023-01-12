@@ -69,7 +69,7 @@ public class RecognizePhotoCommand extends AbsCommand {
 
                 BufferedImage originalImage = ImageIO.read(new FileInputStream(file));
                 BufferedImage resizedImage = resizer.resizeImage(originalImage, 224, 224);
-                imageSaver.saveImage(userId, resizedImage, UUID.randomUUID().toString());
+                imageSaver.saveImage(userId, resizedImage, UUID.randomUUID().toString() + ".jpg");
 
                 Map<Label, Double> labelsProbabilities = imageRecognizer.recognizePhoto(file);
 
