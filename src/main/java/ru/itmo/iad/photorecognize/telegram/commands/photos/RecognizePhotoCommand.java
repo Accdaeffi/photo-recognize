@@ -5,11 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
-import ru.itmo.iad.photorecognize.domain.Label;
-import ru.itmo.iad.photorecognize.service.ImageRecognizer;
+import ru.itmo.iad.photorecognize.service.MonitoringService;
 import ru.itmo.iad.photorecognize.service.ImageResizer;
 import ru.itmo.iad.photorecognize.service.ImageSaver;
 import ru.itmo.iad.photorecognize.service.PhotoGetter;
+import ru.itmo.iad.photorecognize.service.RecognizePhotoService;
 import ru.itmo.iad.photorecognize.telegram.commands.AbsCommand;
 import ru.itmo.iad.photorecognize.telegram.response.Response;
 import ru.itmo.iad.photorecognize.telegram.response.StringResponse;
@@ -19,6 +19,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
 import java.util.*;
 
 @Service
@@ -30,14 +31,16 @@ public class RecognizePhotoCommand extends AbsCommand {
     PhotoGetter photoGetter;
 
     @Autowired
-    ImageRecognizer imageRecognizer;
+    MonitoringService monitoringService;
+
+    @Autowired
+    RecognizePhotoService recognizePhotoService;
 
     @Autowired
     ImageResizer resizer;
 
     @Autowired
     ImageSaver imageSaver;
-
 
 
     private final List<PhotoSize> photoSizes;
@@ -61,84 +64,30 @@ public class RecognizePhotoCommand extends AbsCommand {
             return new StringResponse(checkResult);
         }*/
 
-        File file = photoGetter.getUserImage(photoSize);
+        File file = null;
+        try {
+            file = photoGetter.getUserImage(photoSize);
+        } catch (Exception e) {
+            monitoringService.incrementErrorRecognizeCounter();
+            log.error("Unable to get photo: " + e.getMessage());
+        }
 
         if (file != null) {
+            log.info("Photo got!");
             try {
-                log.info("Photo got!");
-
                 BufferedImage originalImage = ImageIO.read(new FileInputStream(file));
                 BufferedImage resizedImage = resizer.resizeImage(originalImage, 224, 224);
                 imageSaver.saveImage(userId, resizedImage, UUID.randomUUID().toString() + ".jpg");
-
-                Map<Label, Double> labelsProbabilities = imageRecognizer.recognizePhoto(file);
-
-                if (labelsProbabilities != null) {
-
-                    log.info("Labels probabilities got!");
-
-                    String probabilities = labelsProbabilities.entrySet()
-                        .stream()
-                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                        .limit(3)
-                        .map(this::formatEntryText)
-                        .reduce((acc, value) -> acc + "\n" + value)
-                        .orElse(null);
-
-                    if (probabilities != null) {
-                        String result = "Самые вероятные классы:\n" + probabilities;
-                        return new StringResponse(result);
-                    } else {
-                        return new StringResponse("Ошибка при внутренней обработки полученых классов!");
-                    }
-                } else {
-                    return new StringResponse("Ошибка при получении списка вероятностей!");
-                }
             } catch (IOException ex) {
                 log.error("Ошибка при обработке!", ex);
                 return new StringResponse("Ошибка при вводе-выводе!");
             }
+
+            return recognizePhotoService.recognize(file);
         } else {
             log.info("Getting photo failed!");
+            monitoringService.incrementErrorRecognizeCounter();
             return new StringResponse("Ошибка при загрузка фото из Telegram!");
         }
-    }
-
-    private String formatEntryText(Map.Entry<Label, Double> entry) {
-        // rounded to 1 digit after dot
-        Double probability = Math.round(entry.getValue() * 1000) / 10.0;
-        Label label = entry.getKey();
-
-        return String.format(
-            "▪ %.1f%% – %s (%s)",
-            probability,
-            label.getButtonText(),
-            label.getLabelZeroLevel().getButtonText()
-        );
-    }
-
-    private String checkUserImage(PhotoSize photo) {
-        StringBuilder result = new StringBuilder();
-        Optional.ofNullable(photo).ifPresentOrElse(
-            photoToCheck -> {
-                if (!checkSizes(photoToCheck) || !checkSize(photoToCheck)) {
-                    result.append("Изображение неправильного размера или формата " +
-                        "(максимальные размеры 1920*1080, 50Мб, форматы: png, jpg, jpeg)");
-                } else {
-                    result.append("ok");
-                }
-            },
-            () -> result.append("Пустое изображение")
-        );
-        return result.toString();
-    }
-
-    private boolean checkSize(PhotoSize photo) {
-        int sizeInKb = photo.getFileSize() / 1024;
-        return sizeInKb >= 1 && (sizeInKb / 1024) <= 100;
-    }
-
-    private boolean checkSizes(PhotoSize photo) {
-        return photo.getHeight() <= 1080 && photo.getWidth() <= 1920;
     }
 }
