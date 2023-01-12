@@ -64,7 +64,7 @@ public class RecognizePhotoCommand extends AbsCommand {
                     .orElse(null);
 
                 if (probabilities != null) {
-                    String result = "Самые вероятные классы (с вероятностями):\n" + probabilities;
+                    String result = "Самые вероятные классы:\n" + probabilities;
                     return new StringResponse(result);
                 } else {
                     return new StringResponse("Ошибка при внутренней обработки полученых классов!");
