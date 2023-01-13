@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.User;
 import ru.itmo.iad.photorecognize.telegram.commands.AbsCommand;
+import ru.itmo.iad.photorecognize.telegram.commands.general.HelpCommand;
 import ru.itmo.iad.photorecognize.telegram.commands.general.StartCommand;
 
 @Service
@@ -39,6 +40,11 @@ public class MessageParser implements ApplicationContextAware {
             switch (command) {
                 case "/start": {
                     commandHandler = appContext.getBean(StartCommand.class);
+                }
+                break;
+
+                case "/help": {
+                    commandHandler = appContext.getBean(HelpCommand.class);
                 }
                 break;
 

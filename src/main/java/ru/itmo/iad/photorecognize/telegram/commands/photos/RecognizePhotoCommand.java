@@ -42,7 +42,6 @@ public class RecognizePhotoCommand extends AbsCommand {
     @Autowired
     ImageSaver imageSaver;
 
-
     private final List<PhotoSize> photoSizes;
 
     private final String userId;
@@ -59,7 +58,7 @@ public class RecognizePhotoCommand extends AbsCommand {
 
         PhotoSize photoSize = photoSizes.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
 
-     /*   String checkResult = checkUserImage(photoSize);
+     /*   String checkResult = recognizePhotoService.checkUserImage(photoSize);
         if (!checkResult.equals("ok")) {
             return new StringResponse(checkResult);
         }*/

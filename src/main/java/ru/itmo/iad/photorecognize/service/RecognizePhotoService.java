@@ -17,14 +17,15 @@ import java.util.Optional;
 @Slf4j
 public class RecognizePhotoService {
     @Autowired
-    ImageRecognizer imageRecognizer;
+    private ImageRecognizer imageRecognizer;
 
     @Autowired
-    MonitoringService monitoringService;
+    private MonitoringService monitoringService;
 
     @Timed("recognize_timer")
     public StringResponse recognize(File file) {
         Map<Label, Double> labels = sendRequest(file);
+
         if (labels != null) {
             log.info("Labels probabilities got!");
 
@@ -44,7 +45,7 @@ public class RecognizePhotoService {
             } else {
                 log.error("Internal error: unable to process classes.");
                 monitoringService.incrementErrorRecognizeCounter();
-                return new StringResponse("Ошибка при внутренней обработки полученых классов!");
+                return new StringResponse("Ошибка при внутренней обработке полученых классов!");
             }
         } else {
             log.info("Failed to get probability list");

@@ -10,6 +10,8 @@ import ru.itmo.iad.photorecognize.service.MonitoringService;
 import ru.itmo.iad.photorecognize.telegram.commands.general.HelpCommand;
 
 import static com.mongodb.assertions.Assertions.assertFalse;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 class HelpCommandTest {
     @Mock
@@ -27,5 +29,12 @@ class HelpCommandTest {
     @Test
     void testResponse() {
         assertFalse(helpCommand.execute().getContent().isEmpty());
+    }
+
+    @Test
+    void testException() {
+        doThrow(RuntimeException.class).when(monitoringService).incrementHelpCounter();
+        helpCommand.execute();
+        verify(monitoringService).incrementHelpErrorCounter();
     }
 }
